@@ -7,8 +7,9 @@ package protocol
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
+
+	"github.com/segmentio/encoding/json"
 
 	"go.lsp.dev/jsonrpc2"
 	"go.lsp.dev/pkg/xcontext"

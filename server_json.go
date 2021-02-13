@@ -9,8 +9,9 @@ package protocol
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
+
+	"github.com/segmentio/encoding/json"
 
 	"go.uber.org/zap"
 
