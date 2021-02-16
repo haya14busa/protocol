@@ -1110,7 +1110,7 @@ func testSignatureHelpParams(t *testing.T, marshal marshalFunc, unmarshal unmars
 		invalidWorkDoneToken = "dd134d84-c134-4d7a-a2a3-f8af3ef4a568"
 	)
 	const (
-		want        = `{"textDocument":{"uri":"file:///path/to/basic.go"},"position":{"line":25,"character":1},"workDoneToken":"` + wantWorkDoneToken + `","context":{"triggerKind":1,"triggerCharacter":".","isRetrigger":true,"activeSignatureHelp":{"signatures":[{"documentationFormat":["markdown"],"parameterInformation":{"label":"test label","documentation":"test documentation"}}],"activeParameter":10,"activeSignature":5}}}`
+		want        = `{"textDocument":{"uri":"file:///path/to/basic.go"},"position":{"line":25,"character":1},"workDoneToken":"` + wantWorkDoneToken + `","context":{"triggerKind":1,"triggerCharacter":".","isRetrigger":true,"activeSignatureHelp":{"signatures":[{"label":"testLabel","documentation":"testDocumentation","parameters":[{"label":"test label","documentation":"test documentation"}]}],"activeParameter":10,"activeSignature":5}}}`
 		wantNilAll  = `{"textDocument":{"uri":"file:///path/to/basic.go"},"position":{"line":25,"character":1}}`
 		wantInvalid = `{"textDocument":{"uri":"file:///path/to/basic_gen.go"},"position":{"line":2,"character":1},"workDoneToken":"` + invalidWorkDoneToken + `","context":{"triggerKind":0,"triggerCharacter":"aaa","isRetrigger":false,"activeSignatureHelp":{"signatures":[{"documentationFormat":["markdown"],"parameterInformation":{"label":"test label","documentation":"test documentation"}}],"activeParameter":1,"activeSignature":0}}}`
 	)
@@ -1134,12 +1134,13 @@ func testSignatureHelpParams(t *testing.T, marshal marshalFunc, unmarshal unmars
 			ActiveSignatureHelp: &SignatureHelp{
 				Signatures: []SignatureInformation{
 					{
-						DocumentationFormat: []MarkupKind{
-							Markdown,
-						},
-						ParameterInformation: &ParameterInformation{
-							Label:         "test label",
-							Documentation: "test documentation",
+						Label:         "testLabel",
+						Documentation: "testDocumentation",
+						Parameters: []ParameterInformation{
+							{
+								Label:         "test label",
+								Documentation: "test documentation",
+							},
 						},
 					},
 				},
@@ -1308,19 +1309,20 @@ func TestSignatureHelpTriggerKind_String(t *testing.T) {
 
 func testSignatureHelp(t *testing.T, marshal marshalFunc, unmarshal unmarshalFunc) {
 	const (
-		want        = `{"signatures":[{"documentationFormat":["markdown"],"parameterInformation":{"label":"test label","documentation":"test documentation"}}],"activeParameter":10,"activeSignature":5}`
+		want        = `{"signatures":[{"label":"testLabel","documentation":"testDocumentation","parameters":[{"label":"test label","documentation":"test documentation"}]}],"activeParameter":10,"activeSignature":5}`
 		wantNilAll  = `{"signatures":[]}`
-		wantInvalid = `{"signatures":[{"documentationFormat":["markdown"],"parameterInformation":{"label":"test label","documentation":"test documentation"}}],"activeParameter":1,"activeSignature":0}`
+		wantInvalid = `{"signatures":[{"label":"invalidLabel","documentation":"invalidDocumentation","parameters":[{"label":"test label","documentation":"test documentation"}]}],"activeParameter":1,"activeSignature":0}`
 	)
 	wantType := SignatureHelp{
 		Signatures: []SignatureInformation{
 			{
-				DocumentationFormat: []MarkupKind{
-					Markdown,
-				},
-				ParameterInformation: &ParameterInformation{
-					Label:         "test label",
-					Documentation: "test documentation",
+				Label:         "testLabel",
+				Documentation: "testDocumentation",
+				Parameters: []ParameterInformation{
+					{
+						Label:         "test label",
+						Documentation: "test documentation",
+					},
 				},
 			},
 		},
@@ -1428,17 +1430,19 @@ func testSignatureHelp(t *testing.T, marshal marshalFunc, unmarshal unmarshalFun
 
 func testSignatureInformation(t *testing.T, marshal marshalFunc, unmarshal unmarshalFunc) {
 	const (
-		want        = `{"documentationFormat":["markdown"],"parameterInformation":{"label":"test label","documentation":"test documentation"}}`
-		wantInvalid = `{"documentationFormat":["markdown","plaintext"],"parameterInformation":{"label":"test label","documentation":"test documentation"}}`
+		want        = `{"label":"testLabel","documentation":"testDocumentation","parameters":[{"label":"test label","documentation":"test documentation"}],"activeParameter":5}`
+		wantInvalid = `{"label":"testLabel","documentation":"invalidDocumentation","parameters":[{"label":"test label","documentation":"test documentation"}],"activeParameter":50}`
 	)
 	wantType := SignatureInformation{
-		DocumentationFormat: []MarkupKind{
-			Markdown,
+		Label:         "testLabel",
+		Documentation: "testDocumentation",
+		Parameters: []ParameterInformation{
+			{
+				Label:         "test label",
+				Documentation: "test documentation",
+			},
 		},
-		ParameterInformation: &ParameterInformation{
-			Label:         "test label",
-			Documentation: "test documentation",
-		},
+		ActiveParameter: uint32(5),
 	}
 
 	t.Run("Marshal", func(t *testing.T) {
@@ -3011,7 +3015,7 @@ func testCodeAction(t *testing.T, marshal marshalFunc, unmarshal unmarshalFunc) 
 						TextDocumentIdentifier: TextDocumentIdentifier{
 							URI: uri.File("/path/to/test.go"),
 						},
-						Version: NewVersion(10),
+						Version: int32(10),
 					},
 					Edits: []TextEdit{
 						{

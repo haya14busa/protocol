@@ -426,12 +426,12 @@ func testLogMessageParams(t *testing.T, marshal marshalFunc, unmarshal unmarshal
 
 func testWorkDoneProgressCreateParams(t *testing.T, marshal marshalFunc, unmarshal unmarshalFunc) {
 	const (
-		wantToken    = int64(1569)
-		invalidToken = int64(1348)
+		wantToken    = int32(1569)
+		invalidToken = int32(1348)
 	)
 	var (
-		want        = `{"token":` + strconv.FormatInt(wantToken, 10) + `}`
-		wantInvalid = `{"token":` + strconv.FormatInt(invalidToken, 10) + `}`
+		want        = `{"token":` + strconv.FormatInt(int64(wantToken), 10) + `}`
+		wantInvalid = `{"token":` + strconv.FormatInt(int64(invalidToken), 10) + `}`
 	)
 	token := NewNumberProgressToken(wantToken)
 	wantType := WorkDoneProgressCreateParams{
@@ -511,7 +511,7 @@ func testWorkDoneProgressCreateParams(t *testing.T, marshal marshalFunc, unmarsh
 					t.Fatal(err)
 				}
 
-				if diff := cmp.Diff(fmt.Sprint(got.Token), strconv.FormatInt(wantToken, 10)); (diff != "") != tt.wantErr {
+				if diff := cmp.Diff(fmt.Sprint(got.Token), strconv.FormatInt(int64(wantToken), 10)); (diff != "") != tt.wantErr {
 					t.Errorf("%s: wantErr: %t\n(-got, +want)\n%s", tt.name, tt.wantErr, diff)
 				}
 			})
@@ -521,12 +521,12 @@ func testWorkDoneProgressCreateParams(t *testing.T, marshal marshalFunc, unmarsh
 
 func testWorkDoneProgressCancelParams(t *testing.T, marshal marshalFunc, unmarshal unmarshalFunc) {
 	const (
-		wantToken    = int64(1569)
-		invalidToken = int64(1348)
+		wantToken    = int32(1569)
+		invalidToken = int32(1348)
 	)
 	var (
-		want        = `{"token":` + strconv.FormatInt(wantToken, 10) + `}`
-		wantInvalid = `{"token":` + strconv.FormatInt(invalidToken, 10) + `}`
+		want        = `{"token":` + strconv.FormatInt(int64(wantToken), 10) + `}`
+		wantInvalid = `{"token":` + strconv.FormatInt(int64(invalidToken), 10) + `}`
 	)
 	token := NewNumberProgressToken(wantToken)
 	wantType := WorkDoneProgressCancelParams{
@@ -606,7 +606,7 @@ func testWorkDoneProgressCancelParams(t *testing.T, marshal marshalFunc, unmarsh
 					t.Fatal(err)
 				}
 
-				if diff := cmp.Diff(fmt.Sprint(got.Token), strconv.FormatInt(wantToken, 10)); (diff != "") != tt.wantErr {
+				if diff := cmp.Diff(fmt.Sprint(got.Token), strconv.FormatInt(int64(wantToken), 10)); (diff != "") != tt.wantErr {
 					t.Errorf("%s: wantErr: %t\n(-got, +want)\n%s", tt.name, tt.wantErr, diff)
 				}
 			})

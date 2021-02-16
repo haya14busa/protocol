@@ -16,9 +16,9 @@ func encodeProgressToken(enc *gojay.Encoder, key string, v *ProgressToken) {
 	}
 	switch {
 	case v.name != "":
-		enc.StringKeyOmitEmpty(key, v.name)
+		enc.StringKey(key, v.name)
 	default:
-		enc.Int64KeyOmitEmpty(key, v.number)
+		enc.Int32Key(key, v.number)
 	}
 }
 
@@ -30,7 +30,7 @@ func decodeProgressToken(dec *gojay.Decoder, k, key string, v *ProgressToken) er
 	case v.name != "":
 		return dec.String(&v.name)
 	default:
-		return dec.Int64(&v.number)
+		return dec.Int32(&v.number)
 	}
 }
 
@@ -40,7 +40,7 @@ func (v *ProgressToken) MarshalJSONObject(enc *gojay.Encoder) {
 	case v.name != "":
 		enc.String(v.name)
 	case v.number > 0:
-		enc.Int64(v.number)
+		enc.Int32(v.number)
 	}
 }
 
@@ -52,26 +52,21 @@ func (v *ProgressToken) UnmarshalJSONObject(dec *gojay.Decoder, _ string) error 
 	if err := dec.String(&v.name); err == nil {
 		return nil
 	}
-	return dec.Int64(&v.number)
+	return dec.Int32(&v.number)
 }
 
 // NKeys implements gojay.UnmarshalerJSONObject.
 func (v *ProgressToken) NKeys() int { return 0 }
 
-// compile time check whether the ProgressParams implements a gojay.MarshalerJSONObject and gojay.UnmarshalerJSONObject interfaces.
+// compile time check whether the ProgressToken implements a gojay.MarshalerJSONObject and gojay.UnmarshalerJSONObject interfaces.
 var (
-	_ gojay.MarshalerJSONObject   = (*ProgressParams)(nil)
-	_ gojay.UnmarshalerJSONObject = (*ProgressParams)(nil)
+	_ gojay.MarshalerJSONObject   = (*ProgressToken)(nil)
+	_ gojay.UnmarshalerJSONObject = (*ProgressToken)(nil)
 )
 
 // MarshalJSONObject implements gojay.MarshalerJSONObject.
 func (v *ProgressParams) MarshalJSONObject(enc *gojay.Encoder) {
-	switch {
-	case v.Token.name != "":
-		enc.StringKeyOmitEmpty(keyToken, v.Token.name)
-	default:
-		enc.Int64KeyOmitEmpty(keyToken, v.Token.number)
-	}
+	encodeProgressToken(enc, keyToken, &v.Token)
 	enc.AddInterfaceKey(keyValue, v.Value)
 }
 
@@ -82,11 +77,8 @@ func (v *ProgressParams) IsNil() bool { return v == nil }
 func (v *ProgressParams) UnmarshalJSONObject(dec *gojay.Decoder, k string) error {
 	switch k {
 	case keyToken:
-		switch {
-		case v.Token.name != "":
-			return dec.String(&v.Token.name)
-		default:
-			return dec.Int64(&v.Token.number)
+		if !v.Token.IsZero() {
+			return decodeProgressToken(dec, k, keyToken, &v.Token)
 		}
 	case keyValue:
 		return dec.Interface(&v.Value)
@@ -109,7 +101,7 @@ func (v *WorkDoneProgressBegin) MarshalJSONObject(enc *gojay.Encoder) {
 	enc.StringKey(keyTitle, v.Title)
 	enc.BoolKeyOmitEmpty(keyCancellable, v.Cancellable)
 	enc.StringKeyOmitEmpty(keyMessage, v.Message)
-	enc.Float64KeyOmitEmpty(keyPercentage, v.Percentage)
+	enc.Uint32KeyOmitEmpty(keyPercentage, v.Percentage)
 }
 
 // IsNil implements gojay.MarshalerJSONObject.
@@ -127,7 +119,7 @@ func (v *WorkDoneProgressBegin) UnmarshalJSONObject(dec *gojay.Decoder, k string
 	case keyMessage:
 		return dec.String(&v.Message)
 	case keyPercentage:
-		return dec.Float(&v.Percentage)
+		return dec.Uint32(&v.Percentage)
 	}
 	return nil
 }
@@ -146,7 +138,7 @@ func (v *WorkDoneProgressReport) MarshalJSONObject(enc *gojay.Encoder) {
 	enc.StringKey(keyKind, string(v.Kind))
 	enc.BoolKeyOmitEmpty(keyCancellable, v.Cancellable)
 	enc.StringKeyOmitEmpty(keyMessage, v.Message)
-	enc.Float64KeyOmitEmpty(keyPercentage, v.Percentage)
+	enc.Uint32KeyOmitEmpty(keyPercentage, v.Percentage)
 }
 
 // IsNil implements gojay.MarshalerJSONObject.
@@ -162,7 +154,7 @@ func (v *WorkDoneProgressReport) UnmarshalJSONObject(dec *gojay.Decoder, k strin
 	case keyMessage:
 		return dec.String(&v.Message)
 	case keyPercentage:
-		return dec.Float(&v.Percentage)
+		return dec.Uint32(&v.Percentage)
 	}
 	return nil
 }
