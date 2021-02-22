@@ -128,6 +128,9 @@ func clientDispatch(ctx context.Context, client Client, reply jsonrpc2.Replier, 
 		return true, reply(ctx, resp, err)
 
 	default:
+		if err := client.UnhandledRequest(ctx, req); err != nil {
+			return true, reply(ctx, nil, err)
+		}
 		return false, nil
 	}
 }

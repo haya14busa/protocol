@@ -52,6 +52,7 @@ type Client interface {
 	ApplyEdit(ctx context.Context, params *ApplyWorkspaceEditParams) (result bool, err error)
 	Configuration(ctx context.Context, params *ConfigurationParams) (result []interface{}, err error)
 	WorkspaceFolders(ctx context.Context) (result []WorkspaceFolder, err error)
+	UnhandledRequest(ctx context.Context, req jsonrpc2.Request) (err error)
 }
 
 const (
@@ -210,4 +211,14 @@ func (c *client) WorkspaceFolders(ctx context.Context) (result []WorkspaceFolder
 		return nil, err
 	}
 	return result, nil
+}
+
+func (c *client) UnhandledRequest(ctx context.Context, req jsonrpc2.Request) (err error) {
+	method := req.Method()
+	c.logger.Debug("call " + method)
+	defer c.logger.Debug("end "+method, zap.Error(err))
+	if err := Call(ctx, c.Conn, method, req, nil); err != nil {
+		return err
+	}
+	return nil
 }
